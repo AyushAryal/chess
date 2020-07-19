@@ -115,7 +115,7 @@ class Board(object):
         x, y = None, None
         while True:
             input_position = input(
-                f"{self.current_player}:Select piece to move (example: 1,2): ")
+                f"{self.current_player}:Select piece to move (example: 1,2 for Black Pawn): ")
             x, y = map(int, input_position.split(","))
             if self.board[x][y] and self.board[x][y].color == self.current_player:
                 break
@@ -145,7 +145,7 @@ class Board(object):
                 if promotion_piece in choices:
                     break
                 else:
-                    print("Enter correct promotion piece.")
+                    print("Enter correct promotion piece:")
         return ((x, y), (x2, y2), promotion_piece)
 
     def undo_move(self):
@@ -289,3 +289,4 @@ if __name__ == "__main__":
         board.make_move(*board.input_move())
         board.switch_player()
         board.print_board()
+    print("Game Over")

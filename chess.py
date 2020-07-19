@@ -17,7 +17,13 @@ class Board(object):
         return 0 <= x < self.size and 0 <= y < self.size
 
     def setup_fen(self, position_fen):
-        position, turn, castling, enpassant, half, _ = position_fen.split(" ")
+        position, turn, castling, enpassant, _, _ = position_fen.split(" ")
+
+        if enpassant != "-":
+            y,x = list(enpassant.lower())
+            y = ord(y) - ord('a')
+            x = self.size - int(x)
+            self.enpassant = (x,y)
 
         for char in castling:
             if char == "K":

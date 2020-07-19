@@ -94,13 +94,13 @@ class Board(object):
 
     def print_board(self):
         for row in self.board:
-            s = ""
+            fmt = ""
             for piece in row:
                 if piece:
-                    s += (" " + str(piece) + " ")
+                    fmt += f" {str(piece)} "
                 else:
-                    s = s+" . "
-            print(s)
+                    fmt += " . "
+            print(fmt)
 
     def switch_player(self):
         self.current_player = "W" if self.current_player == "B" else "B"
@@ -154,7 +154,6 @@ class Board(object):
         x2,y2 = final_position
         move.moved_pieces.append([self.board[x][y], (x,y), (x2,y2)])
 
-
         if self.board[x][y].type == "k":
             if (self.castling[self.board[x][y].color]["k"]):
                 move.delta_castling[self.board[x][y].color]["k"] = False
@@ -190,7 +189,6 @@ class Board(object):
                 self.board[x2][rook_y] = None
                 move.moved_pieces.append([self.board[x2][rook_y2], (x2, rook_y),(x2, rook_y2)])
             else:
-                move.moved_pieces.append([self.board[x][y], (x,y), (x2,y2)])
                 if self.board[x2][y2]:
                     move.captured_pieces.append([self.board[x2][y2], (x2,y2)])
                 self.board[x2][y2] = self.board[x][y]
@@ -199,11 +197,9 @@ class Board(object):
         elif self.board[x][y].type == "p" and self.enpassant == (x2,y2):
             self.board[x2][y2] = self.board[x][y]
             self.board[x][y] = None
-            move.moved_pieces.append([self.board[x2][y2], (x,y), (x2,y2)])
             move.captured_pieces.append([self.board[x][y2], (x,y2)])
             self.board[x][y2] = None
         else:
-            move.moved_pieces.append([self.board[x][y], (x,y), (x2,y2)])
             if self.board[x2][y2]:
                 move.captured_pieces.append([self.board[x2][y2], (x2,y2)])
             self.board[x2][y2] = self.board[x][y]
@@ -214,9 +210,8 @@ class Board(object):
             move.delta_enpassant_square = self.enpassant
         else:
             if self.enpassant:
-                move.delta_enpassant_square = None
+                move.delta_enpassant_square = self.enpassant
             self.enpassant = None
-
         self.moves.append(move)
 
 
@@ -240,18 +235,11 @@ class Board(object):
             return False
         for x, y in self.get_pieces(player):
             for move_x, move_y in Piece.moves(self, (x, y)):
-                # !!!!!!!!!!!!!! No problem in castling since the player is in check.
-                # Enpassant problem!
-                removed = self.board[move_x][move_y]
-                self.board[move_x][move_y] = self.board[x][y]
-                self.board[x][y] = None
+                self.make_move((x,y), (move_x, move_y))
                 if not self.is_check(player):
-                    self.board[x][y] = self.board[move_x][move_y]
-                    self.board[move_x][move_y] = removed
+                    self.undo_move()
                     return False
-                self.board[x][y] = self.board[move_x][move_y]
-                self.board[move_x][move_y] = removed
-
+                self.undo_move()
         return True
 
 
@@ -268,7 +256,7 @@ class Board(object):
 if __name__ == "__main__":
     board = Board()
     #board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    board.setup_fen("rnbqkbnr/pppppppp/8/6P1/8/8/PPPPPP1P/RNBQKBNR b KQkq - 0 1")
+    board.setup_fen("8/2kp4/2b5/4P3/2K5/8/8/8 b - - 0 1")
     board.print_board()
     while not board.is_checkmate():
         print(f"Pinned pieces: {board.get_pinned_piece_positions()}")

@@ -9,7 +9,7 @@ class Piece(object):
 
     def __str__(self):
         return self.__repr__()
-        
+
     def __repr__(self):
         color_map = {
             "B": {
@@ -49,39 +49,16 @@ class Piece(object):
                         eliminated_squares.add((x, y_final))
 
             possible_moves = possible_moves.difference(eliminated_squares)
-        elif board[x][y].type == "p" and board_obj.enpassant:
-            eliminated_squares = set()
-            if board_obj.is_check(player):
-                for move_x, move_y in possible_moves:
-                    if board_obj.enpassant == (move_x, move_y):
-                        removed = board[move_x][y]
-                        board[move_x][move_y] = board[x][y]
-                        board[x][y] = None
-                        if board_obj.is_check(player):
-                            eliminated_squares.add((move_x, move_y))
-                        board[x][y] = board[move_x][move_y]
-                        board[move_x][y] = removed
-                    else:
-                        removed = board[move_x][move_y]
-                        board[move_x][move_y] = board[x][y]
-                        board[x][y] = None
-                        if board_obj.is_check(player):
-                            eliminated_squares.add((move_x, move_y))
-                        board[x][y] = board[move_x][move_y]
-                        board[move_x][move_y] = removed
-            possible_moves = possible_moves.difference(eliminated_squares)
         else:
             eliminated_squares = set()
             if board_obj.is_check(player):
                 for move_x, move_y in possible_moves:
-                    removed = board[move_x][move_y]
-                    board[move_x][move_y] = board[x][y]
-                    board[x][y] = None
+                    board_obj.make_move((x,y), (move_x, move_y))
                     if board_obj.is_check(player):
                         eliminated_squares.add((move_x, move_y))
-                    board[x][y] = board[move_x][move_y]
-                    board[move_x][move_y] = removed
+                    board_obj.undo_move()
             possible_moves = possible_moves.difference(eliminated_squares)
+
         return possible_moves
 
     @staticmethod

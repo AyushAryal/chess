@@ -53,7 +53,10 @@ class Piece(object):
             eliminated_squares = set()
             if board_obj.is_check(player):
                 for move_x, move_y in possible_moves:
-                    board_obj.make_move((x,y), (move_x, move_y))
+                    if board[x][y].type == "p" and (move_x == 0 or move_x == board_obj.size-1):
+                        board_obj.make_move((x,y), (move_x, move_y), "q")
+                    else:
+                        board_obj.make_move((x,y), (move_x, move_y), None)
                     if board_obj.is_check(player):
                         eliminated_squares.add((move_x, move_y))
                     board_obj.undo_move()
@@ -68,16 +71,16 @@ class Piece(object):
         x, y = pos
         type_, _ = board[x][y].get_properties()
         return {
-            "p": Piece.pawn_moves,
-            "k": Piece.king_moves,
-            "n": Piece.knight_moves,
-            "r": Piece.ranged_piece_moves,
-            "q": Piece.ranged_piece_moves,
-            "b": Piece.ranged_piece_moves,
+            "p": Piece.pawn_path,
+            "k": Piece.king_path,
+            "n": Piece.knight_path,
+            "r": Piece.ranged_piece_path,
+            "q": Piece.ranged_piece_path,
+            "b": Piece.ranged_piece_path,
         }[type_](board_obj, pos)
 
     @staticmethod
-    def pawn_moves(board_obj, pos):
+    def pawn_path(board_obj, pos):
         board = board_obj.board
         x, y = pos
         _, color = board[x][y].get_properties()
@@ -99,7 +102,7 @@ class Piece(object):
         return(options)
 
     @staticmethod
-    def knight_moves(board_obj, pos):
+    def knight_path(board_obj, pos):
         board = board_obj.board
         x, y = pos
         options = set()
@@ -111,7 +114,7 @@ class Piece(object):
         return options
 
     @staticmethod
-    def king_moves(board_obj, pos):
+    def king_path(board_obj, pos):
         board = board_obj.board
         x, y = pos
         options = set()
@@ -135,7 +138,7 @@ class Piece(object):
         return options
 
     @staticmethod
-    def ranged_piece_moves(board_obj, pos):
+    def ranged_piece_path(board_obj, pos):
         options = set()
         board = board_obj.board
         x, y = pos
@@ -146,7 +149,7 @@ class Piece(object):
             "b": ((1, 1), (1, -1), (-1, 1), (-1, -1)),
         }
 
-        def ranged_moves(board_obj, x, y, delta_choices):
+        def ranged_path(board_obj, x, y, delta_choices):
             board = board_obj.board
             options = set()
             for dx, dy in delta_choices:
@@ -157,6 +160,6 @@ class Piece(object):
                         break
             return options
 
-        options.update(ranged_moves(
+        options.update(ranged_path(
             board_obj, x, y, delta_choices[type_]))
         return options

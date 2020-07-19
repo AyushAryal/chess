@@ -7,3 +7,4 @@ class Move:
     delta_enpassant_square =  None
     moved_pieces : list = field(default_factory=lambda: [])
     captured_pieces : list = field(default_factory=lambda: [])
+    promotion_piece = None

@@ -130,8 +130,17 @@ class Board(object):
                 break
             else:
                 print("Not a valid option")
-        return ((x, y), (x2, y2))
 
+        promotion_piece = None
+        if self.board[x][y].type == "p" and (x2 == 0 or x2 == self.size - 1):
+            while True:
+                choices = ("q", "r", "b", "n")
+                promotion_piece = input("Enter which piece to promote to:")
+                if promotion_piece in choices:
+                    break
+                else:
+                    print("Enter correct promotion piece.")
+        return ((x, y), (x2, y2), promotion_piece)
 
     def undo_move(self):
         move = self.moves.pop()
@@ -140,19 +149,23 @@ class Board(object):
                 self.castling[player][side] = not right
         self.enpassant = move.delta_enpassant_square
 
-        for piece, (x,y), (x2,y2) in move.moved_pieces:
-            self.board[x][y] = self.board[x2][y2]
-            self.board[x2][y2] = None
+        for piece, (x, y), (x2, y2) in move.moved_pieces:
+            if move.promotion_piece:
+                self.board[x][y] = self.board[x2][y2]
+                self.board[x][y].type = "p"
+                self.board[x2][y2] = None
+            else:
+                self.board[x][y] = self.board[x2][y2]
+                self.board[x2][y2] = None
 
-        for piece, (x,y) in move.captured_pieces:
+        for piece, (x, y) in move.captured_pieces:
             self.board[x][y] = piece
-        
 
-    def make_move(self, initial_position, final_position):
+    def make_move(self, initial_position, final_position, promotion_piece):
         move = Move()
-        x,y = initial_position
-        x2,y2 = final_position
-        move.moved_pieces.append([self.board[x][y], (x,y), (x2,y2)])
+        x, y = initial_position
+        x2, y2 = final_position
+        move.moved_pieces.append([self.board[x][y], (x, y), (x2, y2)])
 
         if self.board[x][y].type == "k":
             if (self.castling[self.board[x][y].color]["k"]):
@@ -173,9 +186,10 @@ class Board(object):
                 }
             }[self.board[x][y].color]
             for side, rook_position in rook_initial_positions.items():
-                if (x,y) == rook_position:
+                if (x, y) == rook_position:
                     if self.castling[self.board[x][y].color][side]:
-                        move.delta_castling[self.board[x][y].color][side] = False
+                        move.delta_castling[self.board[x]
+                                            [y].color][side] = False
                     self.castling[self.board[x][y].color][side] = False
 
         if self.board[x][y].type == 'k':
@@ -183,37 +197,41 @@ class Board(object):
                 self.board[x2][y2] = self.board[x][y]
                 self.board[x][y] = None
                 direction = (y2 - y)//2
-                rook_y = self.size-1 if direction>0 else 0
+                rook_y = self.size-1 if direction > 0 else 0
                 rook_y2 = y2 - direction
                 self.board[x2][rook_y2] = self.board[x2][rook_y]
                 self.board[x2][rook_y] = None
-                move.moved_pieces.append([self.board[x2][rook_y2], (x2, rook_y),(x2, rook_y2)])
+                move.moved_pieces.append(
+                    [self.board[x2][rook_y2], (x2, rook_y), (x2, rook_y2)])
             else:
                 if self.board[x2][y2]:
-                    move.captured_pieces.append([self.board[x2][y2], (x2,y2)])
+                    move.captured_pieces.append([self.board[x2][y2], (x2, y2)])
                 self.board[x2][y2] = self.board[x][y]
                 self.board[x][y] = None
 
-        elif self.board[x][y].type == "p" and self.enpassant == (x2,y2):
+        elif self.board[x][y].type == "p" and self.enpassant == (x2, y2):
             self.board[x2][y2] = self.board[x][y]
             self.board[x][y] = None
-            move.captured_pieces.append([self.board[x][y2], (x,y2)])
+            move.captured_pieces.append([self.board[x][y2], (x, y2)])
             self.board[x][y2] = None
         else:
             if self.board[x2][y2]:
-                move.captured_pieces.append([self.board[x2][y2], (x2,y2)])
+                move.captured_pieces.append([self.board[x2][y2], (x2, y2)])
             self.board[x2][y2] = self.board[x][y]
             self.board[x][y] = None
 
-        if self.board[x2][y2].type == "p" and abs(x2 - x)==2:
-            self.enpassant = ((x2 + (x-x2)//2 , y))
+        if promotion_piece:
+            self.board[x2][y2].type = promotion_piece
+            move.promotion_piece = promotion_piece
+
+        if self.board[x2][y2].type == "p" and abs(x2 - x) == 2:
+            self.enpassant = ((x2 + (x-x2)//2, y))
             move.delta_enpassant_square = self.enpassant
         else:
             if self.enpassant:
                 move.delta_enpassant_square = self.enpassant
             self.enpassant = None
         self.moves.append(move)
-
 
     def find_piece(self, type_of_piece, color_of_piece):
         for x in range(self.size):
@@ -235,13 +253,15 @@ class Board(object):
             return False
         for x, y in self.get_pieces(player):
             for move_x, move_y in Piece.moves(self, (x, y)):
-                self.make_move((x,y), (move_x, move_y))
+                if self.board[x][y].type == "p" and (x == 0 or x == self.size-1):
+                    self.make_move((x, y), (move_x, move_y), "q")
+                else:
+                    self.make_move((x, y), (move_x, move_y), None)
                 if not self.is_check(player):
                     self.undo_move()
                     return False
                 self.undo_move()
         return True
-
 
     def get_attacking_squares(self, player=None):
         if not player:
@@ -255,8 +275,8 @@ class Board(object):
 
 if __name__ == "__main__":
     board = Board()
-    #board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    board.setup_fen("8/2kp4/2b5/4P3/2K5/8/8/8 b - - 0 1")
+    board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    #board.setup_fen("r4K2/3P4/8/2k5/8/8/8/8 w - - 0 1")
     board.print_board()
     while not board.is_checkmate():
         print(f"Pinned pieces: {board.get_pinned_piece_positions()}")

@@ -75,7 +75,7 @@ class Board(object):
         player_pieces = self.get_pieces(player)
         opponent_pieces = self.get_pieces("W" if player == "B" else "B")
 
-        king_position = board.find_piece("k", player)
+        king_position = self.find_piece("k", player)
         check_count = 0
         for opponent_position in opponent_pieces:
             for move_x, move_y in Piece.path(self, opponent_position):
@@ -117,7 +117,7 @@ class Board(object):
             input_position = input(
                 f"{self.current_player}:Select piece to move (example: 1,2 for Black Pawn): ")
             x, y = map(int, input_position.split(","))
-            if self.board[x][y] and self.board[x][y].color == self.current_player:
+            if self.board[x][y] and self.board[x][y].color == self.current_player and self.board[x][y].moves(self, (x,y)):
                 break
             else:
                 print("Not a valid piece to move.")
@@ -281,8 +281,8 @@ class Board(object):
 
 if __name__ == "__main__":
     board = Board()
-    board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    #board.setup_fen("r4K2/3P4/8/2k5/8/8/8/8 w - - 0 1")
+    # board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    board.setup_fen("4k3/8/1B2NRp1/R1Q2B2/1Bp2N2/8/PP4PP/4K3 w - - 0 1")
     board.print_board()
     while not board.is_checkmate():
         print(f"Pinned pieces: {board.get_pinned_piece_positions()}")

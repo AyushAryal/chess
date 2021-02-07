@@ -93,7 +93,7 @@ class Piece(object):
             options.add((x + direction, y+1))
         if board_obj.within_boundaries(x + direction, y) and not board[x + direction][y]:
             options.add((x + direction, y))
-        if (not board[x + direction][y]) and (not board[x + direction*2][y]) and (x == board_obj.size-2 or x == 1):
+        if board_obj.within_boundaries(x+direction*2, y) and (not board[x + direction][y]) and (not board[x + direction*2][y]) and (x == board_obj.size-2 or x == 1):
             options.add((x + direction*2, y))
         if board_obj.enpassant:
             en_x, en_y = board_obj.enpassant

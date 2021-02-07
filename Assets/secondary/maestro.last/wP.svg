@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50mm" height="50mm" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="matrix(1.4047 0 0 1.3241 428.15 978.66)" fill="#dedede" stroke="#050505" stroke-width=".25867">
+  <g fill="#dedede" stroke="#050505" stroke-width=".25867">
+   <path class="st19" d="m-287-731.2c-1.8 0-3.6 1.1-4.2 2.9-0.5 1.4-0.1 3 1 4 0.3 0.4 0.8 0.6 1.2 0.9-3.1 1-6.518 2.788-6.518 2.788l1.1 2.106s4.418-0.39473 4.618 0.30527c2 4.7-6.5 6.9007-6.8 12.701h19.2c-0.3-5.9-8.7-8.0007-6.8-12.701 0.3-0.7 4.618-0.30527 4.618-0.30527l1.1-2.106s-3.418-1.688-6.518-2.788c0.4-0.3 0.9-0.5 1.2-0.9 1.1-1 1.5-2.6 1-4-0.6-1.8-2.4-2.9-4.2-2.9z" fill="#dcdcdc" stroke="#191919" stroke-linecap="round" stroke-linejoin="round" stroke-width=".73325"/>
+  </g>
+ </g>
+</svg>

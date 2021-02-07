@@ -231,8 +231,8 @@ class Board(object):
             move.promotion_piece = promotion_piece
 
         if self.board[x2][y2].type == "p" and abs(x2 - x) == 2:
-            self.enpassant = ((x2 + (x-x2)//2, y))
             move.delta_enpassant_square = self.enpassant
+            self.enpassant = ((x2 + (x-x2)//2, y))
         else:
             if self.enpassant:
                 move.delta_enpassant_square = self.enpassant
@@ -275,14 +275,23 @@ class Board(object):
         pieces = self.get_pieces(player)
         attacking_squares = set()
         for piece_position in pieces:
-            attacking_squares.update(Piece.path(self, piece_position))
+            x,y = piece_position
+            if self.board[x][y].type == "p":
+                direction = -1 if self.board[x][y].color == "W" else +1
+                if self.within_boundaries(x+direction, y-1):
+                    attacking_squares.add((x+direction, y-1))
+                if self.within_boundaries(x+direction, y+1):
+                    attacking_squares.add((x+direction, y+1))
+            else:
+                attacking_squares.update(Piece.path(self, piece_position))
+
         return attacking_squares
 
 
 if __name__ == "__main__":
     board = Board()
     # board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    board.setup_fen("4k3/8/1B2NRp1/R1Q2B2/1Bp2N2/8/PP4PP/4K3 w - - 0 1")
+    board.setup_fen("r1bqkbnr/1pp2ppp/p1Bp4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b Qkq - 0 1")
     board.print_board()
     while not board.is_checkmate():
         print(f"Pinned pieces: {board.get_pinned_piece_positions()}")

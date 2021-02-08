@@ -49,7 +49,7 @@ def render(window, board):
 def render_options(window, options):
     partition = window.get_height() // 8
     option_icon = pygame.image.load(
-        os.path.join("Assets", "possible_positions1.png"))
+        os.path.join("Assets", "possible_positions.png"))
     option_icon = pygame.transform.scale(option_icon, (partition, partition))
     for option_x, option_y in options:
         window.blit(option_icon, (option_y * partition, option_x * partition))

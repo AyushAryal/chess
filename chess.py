@@ -2,6 +2,7 @@ from piece import Piece
 from itertools import groupby
 from move import Move
 
+
 class Board(object):
     def __init__(self, size=8):
         self.board = [[None]*size for _ in range(size)]
@@ -20,10 +21,10 @@ class Board(object):
         position, turn, castling, enpassant, _, _ = position_fen.split(" ")
 
         if enpassant != "-":
-            y,x = list(enpassant.lower())
+            y, x = list(enpassant.lower())
             y = ord(y) - ord('a')
             x = self.size - int(x)
-            self.enpassant = (x,y)
+            self.enpassant = (x, y)
 
         for char in castling:
             if char == "K":
@@ -117,7 +118,7 @@ class Board(object):
             input_position = input(
                 f"{self.current_player}:Select piece to move (example: 1,2 for Black Pawn): ")
             x, y = map(int, input_position.split(","))
-            if self.board[x][y] and self.board[x][y].color == self.current_player and self.board[x][y].moves(self, (x,y)):
+            if self.board[x][y] and self.board[x][y].color == self.current_player and self.board[x][y].moves(self, (x, y)):
                 break
             else:
                 print("Not a valid piece to move.")
@@ -252,22 +253,21 @@ class Board(object):
         king_position = self.find_piece("k", player)
         return king_position in self.get_attacking_squares("W" if player == "B" else "B")
 
+    def cannot_move(self, player=None):
+        for x, y in self.get_pieces(player):
+            if Piece.moves(self, (x, y)):
+                return False
+        return True
+        
+    def is_stalemate(self, player=None):
+        if not player:
+            player = self.current_player
+        return self.cannot_move(player) and not self.is_check(player)
+
     def is_checkmate(self, player=None):
         if not player:
             player = self.current_player
-        if not self.is_check(player):
-            return False
-        for x, y in self.get_pieces(player):
-            for move_x, move_y in Piece.moves(self, (x, y)):
-                if self.board[x][y].type == "p" and (x == 0 or x == self.size-1):
-                    self.make_move((x, y), (move_x, move_y), "q")
-                else:
-                    self.make_move((x, y), (move_x, move_y), None)
-                if not self.is_check(player):
-                    self.undo_move()
-                    return False
-                self.undo_move()
-        return True
+        return self.cannot_move(player) and self.is_check(player)
 
     def get_attacking_squares(self, player=None):
         if not player:
@@ -275,7 +275,7 @@ class Board(object):
         pieces = self.get_pieces(player)
         attacking_squares = set()
         for piece_position in pieces:
-            x,y = piece_position
+            x, y = piece_position
             if self.board[x][y].type == "p":
                 direction = -1 if self.board[x][y].color == "W" else +1
                 if self.within_boundaries(x+direction, y-1):
@@ -283,7 +283,7 @@ class Board(object):
                 if self.within_boundaries(x+direction, y+1):
                     attacking_squares.add((x+direction, y+1))
             else:
-                attacking_squares.update(Piece.path(self, piece_position))
+                attacking_squares.update(Piece.attack(self, piece_position))
 
         return attacking_squares
 
@@ -291,7 +291,7 @@ class Board(object):
 if __name__ == "__main__":
     board = Board()
     # board.setup_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    board.setup_fen("r1bqkbnr/1pp2ppp/p1Bp4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b Qkq - 0 1")
+    board.setup_fen("8/2k3P1/8/8/2K5/8/8/8 w - - 0 1")
     board.print_board()
     while not board.is_checkmate():
         print(f"Pinned pieces: {board.get_pinned_piece_positions()}")

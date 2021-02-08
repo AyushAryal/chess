@@ -1,6 +1,6 @@
 # Chess Game With Python
 Chess game developed using python only.
-https://ibb.co/bL0FcRd
+<img src="screenshots/classicchess.png">
 
 - - - -
 
@@ -25,6 +25,7 @@ and you should be good to go.
 # Features
 - Play against the computer
 - Setup board using Fen notation
+<img src="screenshots/fenscreen.png">
 - Play on your termninal
 
 

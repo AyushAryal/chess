@@ -4,8 +4,8 @@ pygame.init()
 import screens
 
 def main():
-    height = 800
-    width = 800
+    height = 600
+    width = 600
     window = pygame.display.set_mode((height, width))
     pygame.display.set_caption("PyChess")
 
